@@ -4,6 +4,8 @@
 - [Koa(express升级版)](https://koa.bootcss.com/)
 - [Koa-router(路由)](https://github.com/ZijianHe/koa-router)
 - [nodemon(热更新)](https://github.com/remy/nodemon)
+- [koa-json-error(错误信息处理)](https://www.npmjs.com/package/koa-json-error)
+- [koa-parameter(请求参数校验)](https://www.npmjs.com/package/koa-parameter)
 
 
 ## 项目启动
