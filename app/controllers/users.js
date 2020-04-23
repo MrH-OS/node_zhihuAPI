@@ -9,14 +9,25 @@ class UsersCtl {
   }
 
   addUser(ctx) {
-    ctx.body = { name: '王二小' }
+    // 参数校验--不满足条件  返回422
+    ctx.verifyParams({
+      name: { type: 'string', required: true }
+    })
+    ctx.body = ctx.request.body
   }
 
   updateUser(ctx) {
+    ctx.verifyParams({
+      id: { type: 'number', required: true },
+      name: { type: 'string', required: true }
+    })
     ctx.body = { name: '李雷2' }
   }
 
   deleteUser(ctx) {
+    ctx.verifyParams({
+      id: { type: 'number', required: true }
+    })
     ctx.status = 204
   }
 }
