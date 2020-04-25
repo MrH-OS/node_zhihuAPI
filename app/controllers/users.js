@@ -1,33 +1,37 @@
+const User = require('../models/users')
+
 class UsersCtl {
-  getList(ctx) {
+  async getList(ctx) {
     ctx.set('Allow', 'GET, POST')
-    ctx.body = [{ name: '韩梅梅' }, { name: '李雷' }]
+    ctx.body = await User.find()
   }
 
-  getUserForId(ctx) {
-    ctx.body = `用户id: ${ctx.params.id}`
+  async getUserForId(ctx) {
+    const user = await User.findById(ctx.params.id)
+    if (!user) { ctx.throw(404, '用户不存在') }
+    ctx.body = user
   }
 
-  addUser(ctx) {
+  async addUser(ctx) {
     // 参数校验--不满足条件  返回422
     ctx.verifyParams({
       name: { type: 'string', required: true }
     })
-    ctx.body = ctx.request.body
+    ctx.body = await new User(ctx.request.body).save()
   }
 
-  updateUser(ctx) {
+  async updateUser(ctx) {
     ctx.verifyParams({
-      id: { type: 'number', required: true },
       name: { type: 'string', required: true }
     })
-    ctx.body = { name: '李雷2' }
+    const user = await User.findByIdAndUpdate(ctx.params.id, ctx.request.body)
+    if (!user) { ctx.throw(404, '用户不存在') }
+    ctx.body = user
   }
 
-  deleteUser(ctx) {
-    ctx.verifyParams({
-      id: { type: 'number', required: true }
-    })
+  async deleteUser(ctx) {
+    const user = await User.findByIdAndRemove(ctx.params.id)
+    if (!user) { ctx.throw(404, '用户不存在') }
     ctx.status = 204
   }
 }

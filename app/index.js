@@ -2,8 +2,13 @@ const Koa = require('koa')
 const bodyParser = require('koa-bodyparser')
 const error = require('koa-json-error')
 const parameter = require('koa-parameter') // 请求体参数校验
+const mongoose = require('mongoose')
 const app = new Koa()
 const routes = require('./routes')
+const { connectionStr } = require('./config')
+
+mongoose.connect(connectionStr, { useNewUrlParser: true }, () => console.log('mongoDB连接成功'))
+mongoose.connection.on('error', console.error)
 
 // 自定义配置错误返回信息(json格式)
 // app.use(async (ctx, next) => {

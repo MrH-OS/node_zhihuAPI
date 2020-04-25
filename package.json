@@ -14,7 +14,8 @@
     "koa-bodyparser": "^4.3.0",
     "koa-json-error": "^3.1.2",
     "koa-parameter": "^3.0.1",
-    "koa-router": "^8.0.8"
+    "koa-router": "^8.0.8",
+    "mongoose": "^5.9.10"
   },
   "devDependencies": {
     "cross-env": "^7.0.2",

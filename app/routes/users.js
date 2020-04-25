@@ -20,6 +20,6 @@ router.put('/:id', updateUser)
 
 router.delete('/:id', deleteUser)
 
-router.get('/:id', auth, getUserForId)
+router.get('/:id', getUserForId)
 
 module.exports = router
