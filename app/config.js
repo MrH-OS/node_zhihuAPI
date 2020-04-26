@@ -1,6 +1,7 @@
-const { mongodbCloudDataBase } = require('../config/global')
+const { mongodbCloudDataBase, secret } = require('../config/global')
 console.log(mongodbCloudDataBase)
 
 module.exports = {
-  connectionStr: mongodbCloudDataBase
+  connectionStr: mongodbCloudDataBase,
+  secret: secret
 }

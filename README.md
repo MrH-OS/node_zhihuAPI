@@ -9,6 +9,9 @@
 - [cross-env(运行跨平台设置和使用环境变量的脚本)](https://www.npmjs.com/package/cross-env)
     + cross-env使得您可以使用单个命令，而不必担心为平台正确设置或使用环境变量。 只要在POSIX系统上运行就可以设置好，而cross-env将会正确地设置它
 - [mongoose(连接mongoDB数据库)](https://www.npmjs.com/package/mongoose)
+- [koa-jwt(实现用户认证与授权的中间件)](https://www.npmjs.com/package/koa-jwt)
+- [koa-body(中间件,支持json,file等)](https://www.npmjs.com/package/koa-body)
+- [koa-static(中间件,生成文件链接)](https://www.npmjs.com/package/koa-static)
 
 
 ## 项目启动

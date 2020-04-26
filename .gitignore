@@ -1,7 +1,9 @@
+
 .DS_Store
 /dist
 node_modules
 config
+app/public/uploads/*
 
 # local env files
 .env.local

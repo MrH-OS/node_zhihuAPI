@@ -1,25 +1,56 @@
+// const jsonWebToken = require('jsonwebtoken')
+const jwt = require('koa-jwt')
 const Router = require('koa-router')
 // 前缀
 const router = new Router({ prefix: '/users' })
 
-const { getList, addUser, deleteUser, getUserForId, updateUser } = require('../controllers/users')
+const {
+  login,
+  getList,
+  addUser,
+  deleteUser,
+  getUserForId,
+  updateUser,
+  checkOwner,
+  checkUserExist,
+  getFollowing,
+  getFollowers,
+  follow,
+  unFollow
+} = require('../controllers/users')
+const { secret } = require('../config')
 
-// 多中间件使用
-const auth = async (ctx, next) => {
-  if (ctx.url !== '/users') {
-    ctx.throw(401)
-  }
-  await next()
-}
+// 中间件使用--- 判断接口是否带有token--是否有权限
+// const auth = async(ctx, next) => {
+//   const { authorization = '' } = ctx.request.header
+//   const token = authorization.replace('Bearer ', '')
+//   try {
+//     ctx.state.user = jsonWebToken.verify(token, secret)
+//   } catch (err) {
+//     ctx.throw(401, err.message)
+//   }
+//   await next()
+// }
+const auth = jwt({ secret })
 
-router.get('/', auth, getList)
+router.post('/login', login)
 
-router.post('/', auth, addUser)
+router.get('/', getList)
 
-router.put('/:id', updateUser)
+router.post('/', addUser)
 
-router.delete('/:id', deleteUser)
+router.patch('/:id', auth, checkOwner, updateUser)
 
-router.get('/:id', getUserForId)
+router.delete('/:id', auth, checkOwner, deleteUser)
+
+router.get('/:id', auth, getUserForId)
+
+router.get('/:id/following', auth, getFollowing)
+
+router.get('/:id/followers', auth, getFollowers)
+
+router.put('/following/:id', auth, checkUserExist, follow)
+
+router.delete('/following/:id', auth, checkUserExist, unFollow)
 
 module.exports = router
