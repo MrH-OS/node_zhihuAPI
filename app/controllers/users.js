@@ -1,6 +1,7 @@
 const jsonWebToken = require('jsonwebtoken')
 const User = require('../models/users')
 const {secret} = require('../config')
+const { extractFields, paginationUtil } = require('../utils/utils')
 
 class UsersCtl {
   async login(ctx) {
@@ -36,13 +37,23 @@ class UsersCtl {
 
   async getList(ctx) {
     ctx.set('Allow', 'GET, POST')
-    ctx.body = await User.find()
+    const { page, size } = paginationUtil(ctx.query.page, ctx.query.size)
+    ctx.body = {
+      list: await User
+        .find({userName: new RegExp(ctx.query.q)})
+        .limit(size)
+        .skip(page * size),
+      total: await User.find({userName: new RegExp(ctx.query.q)}).count(),
+      page: page + 1,
+      size
+    }
   }
 
   async getUserForId(ctx) {
-    const {fields} = ctx.query
-    const selectFields = fields.split(';').filter(f => f).map(f => ' +' + f).join('')
-    const user = await User.findById(ctx.params.id).select(selectFields)
+    const { fields } = ctx.query
+    const selectFields = extractFields(fields, ' +')
+    const populateStr = extractFields(fields)
+    const user = await User.findById(ctx.params.id).select(selectFields).populate(populateStr)
     if (!user) {
       ctx.throw(404, '用户不存在')
     }
