@@ -16,8 +16,13 @@ const {
   getFollowing,
   getFollowers,
   follow,
-  unFollow
+  unFollow,
+  getFollowingTopic,
+  followTopic,
+  unFollowTopic
 } = require('../controllers/users')
+const { checkTopicExist } = require('../controllers/topics')
+
 const { secret } = require('../config')
 
 // 中间件使用--- 判断接口是否带有token--是否有权限
@@ -52,5 +57,11 @@ router.get('/:id/followers', auth, getFollowers)
 router.put('/following/:id', auth, checkUserExist, follow)
 
 router.delete('/following/:id', auth, checkUserExist, unFollow)
+
+router.get('/:id/followingTopic', auth, getFollowingTopic)
+
+router.put('/followingTopic/:id', auth, checkTopicExist, followTopic)
+
+router.delete('/followingTopic/:id', auth, checkTopicExist, unFollowTopic)
 
 module.exports = router

@@ -114,7 +114,7 @@ class UsersCtl {
   async getFollowers(ctx) {
     const users = await User.find({following: ctx.params.id})
     if (!users) {
-      ctx.throw(404)
+      ctx.throw(404, '用户不存在')
     }
     ctx.body = users
   }
@@ -136,6 +136,36 @@ class UsersCtl {
     const index = selfUser.following.map(id => id.toString()).indexOf(followId)
     if (index >= 0) {
       selfUser.following.splice(index, 1)
+      selfUser.save()
+    }
+    ctx.status = 204
+  }
+
+  async getFollowingTopic(ctx) {
+    const user = await User.findById(ctx.params.id).select('+followingTopics').populate('followingTopics')
+    if (!user) {
+      ctx.throw(404, '用户不存在')
+    }
+    ctx.body = user.followingTopics
+  }
+
+  async followTopic(ctx) {
+    const selfUser = await User.findById(ctx.state.user._id).select('+followingTopics')
+    const followId = ctx.params.id
+    const isInclude = selfUser.followingTopics.map(id => id.toString()).includes(followId)
+    if (!isInclude) {
+      selfUser.followingTopics.push(followId)
+      selfUser.save()
+    }
+    ctx.status = 204
+  }
+
+  async unFollowTopic(ctx) {
+    const selfUser = await User.findById(ctx.state.user._id).select('+followingTopics')
+    const followId = ctx.params.id
+    const index = selfUser.followingTopics.map(id => id.toString()).indexOf(followId)
+    if (index >= 0) {
+      selfUser.followingTopics.splice(index, 1)
       selfUser.save()
     }
     ctx.status = 204
