@@ -1,5 +1,7 @@
 const jsonWebToken = require('jsonwebtoken')
 const User = require('../models/users')
+const Question = require('../models/questions')
+const Answer = require('../models/answers')
 const {secret} = require('../config')
 const { extractFields, paginationUtil } = require('../utils/utils')
 
@@ -15,9 +17,12 @@ class UsersCtl {
       ctx.throw(401, '用户名或密码不正确')
     }
     const {_id, userName} = user
-    ctx.body = jsonWebToken.sign({_id, userName}, secret, {
-      expiresIn: '1d'  // token过期时间
-    })
+    ctx.state.user = user
+    ctx.body = {
+      token: jsonWebToken.sign({_id, userName}, secret, {
+        expiresIn: '1d'  // token过期时间
+      })
+    }
   }
 
   // 中间件--检查是否是当前登录用户
@@ -166,6 +171,99 @@ class UsersCtl {
     const index = selfUser.followingTopics.map(id => id.toString()).indexOf(followId)
     if (index >= 0) {
       selfUser.followingTopics.splice(index, 1)
+      selfUser.save()
+    }
+    ctx.status = 204
+  }
+
+  async questionsList(ctx) {
+    ctx.body = await Question.find({questioner: ctx.params.id})
+  }
+
+  async likingAnswersList(ctx) {
+    const user = await User.findById(ctx.params.id).select('+likingAnswers').populate('likingAnswers')
+    if (!user) { ctx.throw(404, '用户不存在') }
+    ctx.body = user.likingAnswers
+  }
+
+  async likeAnswers(ctx, next) {
+    const selfUser = await User.findById(ctx.state.user._id).select('+likingAnswers')
+    const likeId = ctx.params.id
+    const isInclude = selfUser.likingAnswers.map(id => id.toString()).includes(likeId)
+    if (!isInclude) {
+      selfUser.likingAnswers.push(likeId)
+      selfUser.save()
+      await Answer.findByIdAndUpdate(ctx.params.id, {$inc: { voteCount: 1 }})
+    }
+    ctx.status = 204
+    await next()
+  }
+
+  async unLikeAnswers(ctx) {
+    const selfUser = await User.findById(ctx.state.user._id).select('+likingAnswers')
+    const likeId = ctx.params.id
+    const index = selfUser.likingAnswers.map(id => id.toString()).indexOf(likeId)
+    if (index >= 0) {
+      selfUser.likingAnswers.splice(index, 1)
+      selfUser.save()
+      await Answer.findByIdAndUpdate(ctx.params.id, {$inc: { voteCount: -1 }})
+    }
+    ctx.status = 204
+  }
+
+  async disLikeAnswersList(ctx) {
+    const user = await User.findById(ctx.params.id).select('+disLikingAnswers').populate('disLikingAnswers')
+    if (!user) { ctx.throw(404, '用户不存在') }
+    ctx.body = user.disLikingAnswers
+  }
+
+  async disLikingAnswers(ctx, next) {
+    const selfUser = await User.findById(ctx.state.user._id).select('+disLikingAnswers')
+    const disLikeId = ctx.params.id
+    const isInclude = selfUser.disLikingAnswers.map(id => id.toString()).includes(disLikeId)
+    if (!isInclude) {
+      selfUser.disLikingAnswers.push(disLikeId)
+      selfUser.save()
+    }
+    ctx.status = 204
+    await next()
+  }
+
+  async unDisLikeAnswers(ctx) {
+    const selfUser = await User.findById(ctx.state.user._id).select('+disLikingAnswers')
+    const disLikeId = ctx.params.id
+    const index = selfUser.disLikingAnswers.map(id => id.toString()).indexOf(disLikeId)
+    if (index >= 0) {
+      selfUser.disLikingAnswers.splice(index, 1)
+      selfUser.save()
+    }
+    ctx.status = 204
+  }
+
+  async collectingAnswersList(ctx) {
+    const user = await User.findById(ctx.params.id).select('+collectingAnswers').populate('collectingAnswers')
+    if (!user) { ctx.throw(404, '用户不存在') }
+    ctx.body = user.collectingAnswers
+  }
+
+  async collectingAnswers(ctx, next) {
+    const selfUser = await User.findById(ctx.state.user._id).select('+collectingAnswers')
+    const answerId = ctx.params.id
+    const isInclude = selfUser.collectingAnswers.map(id => id.toString()).includes(answerId)
+    if (!isInclude) {
+      selfUser.collectingAnswers.push(answerId)
+      selfUser.save()
+    }
+    ctx.status = 204
+    await next()
+  }
+
+  async unCollectingAnswers(ctx) {
+    const selfUser = await User.findById(ctx.state.user._id).select('+collectingAnswers')
+    const answerId = ctx.params.id
+    const index = selfUser.collectingAnswers.map(id => id.toString()).indexOf(answerId)
+    if (index >= 0) {
+      selfUser.collectingAnswers.splice(index, 1)
       selfUser.save()
     }
     ctx.status = 204

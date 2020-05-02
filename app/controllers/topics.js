@@ -1,5 +1,6 @@
 const Topic = require('../models/topics')
 const User = require('../models/users')
+const Question = require('../models/questions')
 const { extractFields, paginationUtil } = require('../utils/utils')
 
 class TopicsCtl {
@@ -55,6 +56,10 @@ class TopicsCtl {
       ctx.throw(404, '用户不存在')
     }
     ctx.body = users
+  }
+
+  async questionsListForTopic(ctx) {
+    ctx.body = await Question.find({ topics: ctx.params.id })
   }
 }
 

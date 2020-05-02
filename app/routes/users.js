@@ -19,9 +19,20 @@ const {
   unFollow,
   getFollowingTopic,
   followTopic,
-  unFollowTopic
+  unFollowTopic,
+  questionsList,
+  likeAnswers,
+  unLikeAnswers,
+  likingAnswersList,
+  disLikingAnswers,
+  unDisLikeAnswers,
+  disLikeAnswersList,
+  collectingAnswers,
+  collectingAnswersList,
+  unCollectingAnswers
 } = require('../controllers/users')
 const { checkTopicExist } = require('../controllers/topics')
+const { checkAnswerExist } = require('../controllers/answers')
 
 const { secret } = require('../config')
 
@@ -63,5 +74,25 @@ router.get('/:id/followingTopic', auth, getFollowingTopic)
 router.put('/followingTopic/:id', auth, checkTopicExist, followTopic)
 
 router.delete('/followingTopic/:id', auth, checkTopicExist, unFollowTopic)
+
+router.get('/:id/questions', auth, questionsList)
+
+router.post('/:id/likingAnswers', auth, checkAnswerExist, likeAnswers, unDisLikeAnswers)
+
+router.delete('/:id/likingAnswers', auth, checkAnswerExist, unLikeAnswers)
+
+router.get('/:id/likingAnswers', auth, likingAnswersList)
+
+router.post('/:id/disLikeAnswers', auth, checkAnswerExist, disLikingAnswers, unLikeAnswers)
+
+router.delete('/:id/disLikeAnswers', auth, checkAnswerExist, unDisLikeAnswers)
+
+router.get('/:id/disLikeAnswers', auth, disLikeAnswersList)
+
+router.post('/:id/collectAnswers', auth, checkAnswerExist, collectingAnswers)
+
+router.delete('/:id/collectAnswers', auth, checkAnswerExist, unCollectingAnswers)
+
+router.get('/:id/collectAnswers', auth, collectingAnswersList)
 
 module.exports = router
